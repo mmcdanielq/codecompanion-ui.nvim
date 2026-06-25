@@ -89,6 +89,15 @@ function M.attach(chat_bufnr, chat_id)
 
   Input.setup_keymaps(session)
   Input.setup_autocmds(input_bufnr)
+
+  if session.input_draft then
+    vim.api.nvim_buf_set_lines(input_bufnr, 0, -1, false, session.input_draft)
+    local last_line = #session.input_draft
+    local last_col = #session.input_draft[last_line]
+    vim.api.nvim_win_set_cursor(input_winid, { last_line, last_col })
+    session.input_draft = nil
+  end
+
   Input.refresh_placeholder(input_bufnr)
 
   State.active_session_id = chat_id
@@ -185,6 +194,12 @@ function M.detach(chat_id)
   local session = State.get(chat_id)
   if not session then
     return
+  end
+
+  if session.input_bufnr and vim.api.nvim_buf_is_valid(session.input_bufnr) then
+    local lines = vim.api.nvim_buf_get_lines(session.input_bufnr, 0, -1, false)
+    local draft = vim.trim(table.concat(lines, '\n'))
+    session.input_draft = draft ~= '' and lines or nil
   end
 
   if session.input_winid and vim.api.nvim_win_is_valid(session.input_winid) then
