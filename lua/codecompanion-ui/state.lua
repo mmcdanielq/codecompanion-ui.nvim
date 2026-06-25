@@ -11,6 +11,7 @@ local M = {}
 ---@field spinner_idx number
 ---@field spinner_timer uv.uv_timer_t|nil
 ---@field approval_keymaps string[]|nil
+---@field input_draft string[]|nil
 ---@field message { text: string, hl: string }|nil
 ---@field _message_timer uv.uv_timer_t|nil
 
