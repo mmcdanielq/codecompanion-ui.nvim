@@ -12,6 +12,7 @@ local M = {}
 ---@field spinner_timer uv.uv_timer_t|nil
 ---@field approval_keymaps string[]|nil
 ---@field input_draft string[]|nil
+---@field input_draft_cursor [integer, integer]|nil
 ---@field message { text: string, hl: string }|nil
 ---@field _message_timer uv.uv_timer_t|nil
 
