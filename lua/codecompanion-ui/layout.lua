@@ -206,7 +206,10 @@ function M.detach(chat_id)
     local draft = vim.trim(table.concat(lines, '\n'))
     if draft ~= '' then
       session.input_draft = lines
-      session.input_draft_cursor = vim.api.nvim_win_get_cursor(session.input_winid)
+      session.input_draft_cursor = session.input_winid
+          and vim.api.nvim_win_is_valid(session.input_winid)
+          and vim.api.nvim_win_get_cursor(session.input_winid)
+        or nil
     else
       session.input_draft = nil
       session.input_draft_cursor = nil
