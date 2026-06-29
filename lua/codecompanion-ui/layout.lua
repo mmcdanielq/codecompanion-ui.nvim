@@ -92,15 +92,13 @@ function M.attach(chat_bufnr, chat_id)
 
   if session.input_draft then
     vim.api.nvim_buf_set_lines(input_bufnr, 0, -1, false, session.input_draft)
-    if session.input_draft_cursor then
-      vim.api.nvim_win_set_cursor(input_winid, session.input_draft_cursor)
-    else
-      local last_line = #session.input_draft
-      local last_col = #session.input_draft[last_line]
-      vim.api.nvim_win_set_cursor(input_winid, { last_line, last_col })
+    if session.input_draft_view then
+      vim.api.nvim_win_call(input_winid, function()
+        vim.fn.winrestview(session.input_draft_view)
+      end)
     end
     session.input_draft = nil
-    session.input_draft_cursor = nil
+    session.input_draft_view = nil
   end
 
   Input.refresh_placeholder(input_bufnr)
@@ -206,13 +204,13 @@ function M.detach(chat_id)
     local draft = vim.trim(table.concat(lines, '\n'))
     if draft ~= '' then
       session.input_draft = lines
-      session.input_draft_cursor = session.input_winid
+      session.input_draft_view = session.input_winid
           and vim.api.nvim_win_is_valid(session.input_winid)
-          and vim.api.nvim_win_get_cursor(session.input_winid)
+          and vim.api.nvim_win_call(session.input_winid, vim.fn.winsaveview)
         or nil
     else
       session.input_draft = nil
-      session.input_draft_cursor = nil
+      session.input_draft_view = nil
     end
   end
 
