@@ -1,5 +1,21 @@
 {
   "nodes": {
+    "codecompanion-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1794248958,
+        "narHash": "sha256-cXk2d/aR6pcstDSvNQn44Ll6zWs0zUWZz4AjqX/gMjM=",
+        "owner": "olimorris",
+        "repo": "codecompanion.nvim",
+        "rev": "36587a09d7afa65ca9970475b037e6c747afe7a0",
+        "type": "github"
+      },
+      "original": {
+        "owner": "olimorris",
+        "repo": "codecompanion.nvim",
+        "type": "github"
+      }
+    },
     "flake-utils": {
       "inputs": {
         "systems": "systems"
@@ -34,10 +50,28 @@
         "type": "github"
       }
     },
+    "plenary-nvim": {
+      "flake": false,
+      "locked": {
+        "lastModified": 1775800366,
+        "narHash": "sha256-nkfETDkPiE+Kd2BWYZijgUp9bP8RgFwRmvqJz2BMuq4=",
+        "owner": "nvim-lua",
+        "repo": "plenary.nvim",
+        "rev": "74b06c6c75e4eeb3108ec01852001636d85a932b",
+        "type": "github"
+      },
+      "original": {
+        "owner": "nvim-lua",
+        "repo": "plenary.nvim",
+        "type": "github"
+      }
+    },
     "root": {
       "inputs": {
+        "codecompanion-nvim": "codecompanion-nvim",
         "flake-utils": "flake-utils",
         "nixpkgs": "nixpkgs",
+        "plenary-nvim": "plenary-nvim",
         "treefmt-nix": "treefmt-nix"
       }
     },

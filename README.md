@@ -149,6 +149,20 @@ return {
 }
 ```
 
+## Development
+
+The nix dev shell (`nix develop`, or `direnv allow`) provides everything needed, including
+`codecompanion.nvim` and `plenary.nvim` as test-only dependencies:
+
+```sh
+just test       # run busted tests
+just lint       # selene
+just fmt-check  # treefmt
+just check      # all of the above
+```
+
+`nix flake check` runs the same checks in a sandbox and is what CI uses.
+
 ## License
 
 [MIT](./LICENSE)

@@ -45,8 +45,13 @@ function M.attach(chat_bufnr, chat_id)
   local config = require('codecompanion-ui.config')
 
   local existing = State.get(chat_id)
-  if existing and existing.input_winid then
+  if existing and existing.input_winid and vim.api.nvim_win_is_valid(existing.input_winid) then
     return
+  end
+  if existing then
+    -- Input window went away without us noticing (e.g. `:q`, `:only`).
+    -- Normalize state and preserve any draft before re-attaching.
+    M.detach(chat_id)
   end
 
   local chat_winid = find_win_for_buf(chat_bufnr)
@@ -179,12 +184,35 @@ function M.attach(chat_bufnr, chat_id)
     end,
   })
 
-  -- If the input window is closed manually, also close the chat window
+  -- If the input window is closed manually, hide the chat through
+  -- codecompanion so ChatHidden fires and our state is cleaned up via detach.
   vim.api.nvim_create_autocmd('WinClosed', {
     group = group,
     pattern = tostring(session.input_winid),
     callback = function()
-      pcall(vim.api.nvim_win_close, session.chat_winid, false)
+      vim.schedule(function()
+        local chat = require('codecompanion').buf_get_chat(chat_bufnr)
+        if chat and chat.ui:is_visible() then
+          chat.ui:hide()
+        else
+          M.detach(chat_id)
+        end
+      end)
+    end,
+  })
+
+  -- If the chat window is closed manually (e.g. `:q`), close the input too.
+  vim.api.nvim_create_autocmd('WinClosed', {
+    group = group,
+    pattern = tostring(chat_winid),
+    callback = function()
+      vim.schedule(function()
+        -- The chat may have been shown again before this runs
+        if vim.api.nvim_win_is_valid(session.chat_winid) then
+          return
+        end
+        M.detach(chat_id)
+      end)
     end,
   })
 
@@ -215,6 +243,12 @@ function M.detach(chat_id)
 
   if session.input_winid and vim.api.nvim_win_is_valid(session.input_winid) then
     pcall(vim.api.nvim_win_close, session.input_winid, true)
+  end
+
+  -- A fresh buffer is created on each attach; delete the old one so hidden
+  -- scratch buffers don't accumulate across hide/show cycles.
+  if session.input_bufnr and vim.api.nvim_buf_is_valid(session.input_bufnr) then
+    pcall(vim.api.nvim_buf_delete, session.input_bufnr, { force = true })
   end
 
   session.input_winid = nil
